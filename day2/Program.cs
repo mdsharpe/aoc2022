@@ -2,7 +2,9 @@
 
 var input = await System.IO.File.ReadAllLinesAsync(args[0]);
 
-var gamesEnumerable = input.Select(o => RockPaperScissorsGame.Parse(o));
+var secondColIsOutcome = args.Length > 1;
+
+var gamesEnumerable = input.Select(o => RockPaperScissorsGame.Parse(o, secondColIsOutcome));
 
 var totalScore = gamesEnumerable.Select(o => o.Score).DefaultIfEmpty().Sum();
 
