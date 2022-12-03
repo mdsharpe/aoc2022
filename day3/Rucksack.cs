@@ -1,19 +1,22 @@
 class Rucksack
 {
-    public string Contents { get; init; }
+    public HashSet<char> Contents { get; private init; }
+    public HashSet<char>[] Compartments { get; private init; }
 
-    public string[] GetCompartmentContents()
+    public Rucksack(string contents)
     {
-        var halfLength = Contents.Length / 2;
-        return new[] {
-            Contents.Substring(0, halfLength),
-            Contents.Substring(halfLength, halfLength)
+        Contents = contents.ToHashSet();
+
+        var compartmentLength = contents.Length / 2;
+        Compartments = new[]
+        {
+            contents.Substring(0, compartmentLength).ToHashSet(),
+            contents.Substring(compartmentLength, compartmentLength).ToHashSet()
         };
     }
 
     public IEnumerable<char> GetCommonItems()
     {
-        var compartments = GetCompartmentContents();
-        return compartments[0].Where(i => compartments[1].Contains(i)).Distinct();
+        return Compartments[0].Where(i => Compartments[1].Contains(i)).Distinct();
     }
 }

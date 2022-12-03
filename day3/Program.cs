@@ -1,23 +1,22 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using MoreLinq;
 
 var input = await System.IO.File.ReadAllLinesAsync(args[0]);
 
-var rucksacks = input.Select(o => new Rucksack { Contents = o });
+var rucksacks = input.Select(o => new Rucksack(o));
 
-var commonItems = rucksacks
+var commonItemPrioritiesSum = rucksacks
     .SelectMany(o => o.GetCommonItems())
-    .Select(o => new
-    {
-        Item = o,
-        Priority = ItemPrioritisation.GetPriority(o)
-    })
-    .ToArray();
+    .Select(o => ItemPrioritisation.GetPriority(o))
+    .Sum();
 
-foreach (var item in commonItems)
-{
-    Console.WriteLine($"{item.Priority} ({item.Item})");
-}
+Console.WriteLine($"Sum of priorities of rucksack compartment commom items: {commonItemPrioritiesSum}");
 
-var sum = commonItems.Select(o => o.Priority).Sum();
+var groupBadgesSum = rucksacks
+    .Batch(3)
+    .Select(o => new Group(o))
+    .Select(o => o.GetBadge())
+    .Select(o => ItemPrioritisation.GetPriority(o))
+    .Sum();
 
-Console.WriteLine(sum);
+Console.WriteLine($"Sum of priorities of group badges: {groupBadgesSum}");
