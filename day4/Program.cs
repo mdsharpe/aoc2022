@@ -10,7 +10,11 @@ int[] ParseRange(string str)
 bool GetFullyContains(IEnumerable<int> a, IEnumerable<int> b)
     => a.All(b.Contains) || b.All(a.Contains);
 
+bool GetOverlapsAtAll(IEnumerable<int> a, IEnumerable<int> b)
+    => a.Any(b.Contains);
+
 int countFullyContains = 0;
+int countOverlapsAtAll = 0;
 
 foreach (var pairString in input)
 {
@@ -20,6 +24,12 @@ foreach (var pairString in input)
     {
         countFullyContains++;
     }
+
+    if (GetOverlapsAtAll(ranges[0], ranges[1]))
+    {
+        countOverlapsAtAll++;
+    }
 }
 
 Console.WriteLine(countFullyContains.ToString());
+Console.WriteLine(countOverlapsAtAll.ToString());
