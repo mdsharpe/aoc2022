@@ -1,6 +1,9 @@
-﻿var fileRegex = new System.Text.RegularExpressions.Regex("(\\d+) ([\\w.]+)");
+﻿var input = await System.IO.File.ReadAllLinesAsync(args[0]);
 
-var input = await System.IO.File.ReadAllLinesAsync(args[0]);
+var fileRegex = new System.Text.RegularExpressions.Regex("(\\d+) ([\\w.]+)");
+
+const int totalDiskSize = 70000000;
+const int requiredFreeSpace = 30000000;
 
 var dirStack = new Stack<string>();
 var allKnownDirs = new HashSet<string>();
@@ -56,19 +59,33 @@ foreach (var line in input)
     allKnownDirs.Add(GetCurrentPath());
 }
 
+if (allKnownDirs.Contains("/"))
+{
+    allKnownDirs.Remove("/");
+    allKnownDirs.Add("");
+}
+
 var dirSizes = (from dir in allKnownDirs
                 let files = fs.Where(o => o.Key.StartsWith(dir + "/"))
                 select new
                 {
                     Path = dir,
                     Size = files.Select(i => i.Value).DefaultIfEmpty().Sum()
-                }).ToArray();
+                }).ToDictionary(o => o.Path, o => o.Size);
 
-foreach (var item in dirSizes.OrderBy(o => o.Path))
+foreach (var item in dirSizes.OrderBy(o => o.Key))
 {
-    Console.WriteLine($"{item.Path}: {item.Size}");
+    Console.WriteLine($"{item.Key}: {item.Value}");
 }
 
 Console.WriteLine(
     "Sum of sizes of directories with size at most 100000: "
-    + dirSizes.Where(o => o.Size <= 100000).Select(o => o.Size).DefaultIfEmpty().Sum());
+    + dirSizes.Where(o => o.Value <= 100000).Select(o => o.Value).DefaultIfEmpty().Sum());
+
+var currentFreeSpace = totalDiskSize - dirSizes[""];
+var sizeToDelete = requiredFreeSpace - currentFreeSpace;
+
+var dirToDelete = dirSizes.OrderBy(o => o.Value)
+    .First(o => o.Value > sizeToDelete);
+
+Console.WriteLine($"Delete '{dirToDelete.Key}' with size {dirToDelete.Value} to free up {requiredFreeSpace} space");
