@@ -12,8 +12,6 @@ for (var y = 0; y < height; y++)
     }
 }
 
-var visibleCount = 0;
-
 for (var y = 0; y < height; y++)
 {
     for (var x = 0; x < width; x++)
@@ -22,7 +20,7 @@ for (var y = 0; y < height; y++)
 
         (bool Visible, int ScenicScore) InspectDirection(Func<KeyValuePair<(int X, int Y), Tree>, bool> directionClause)
         {
-            var visible = trees.Where(directionClause).Any(t => t.Value.Height >= tree.Height);
+            var visible = trees.Where(directionClause).All(t => t.Value.Height < tree.Height);
 
             return (visible, 0);
         }
@@ -32,11 +30,10 @@ for (var y = 0; y < height; y++)
         var up = InspectDirection(t => t.Key.Y < y && t.Key.X == x);
         var down = InspectDirection(t => t.Key.Y > y && t.Key.X == x);
 
-        if (!left.Visible || !right.Visible || !up.Visible || !down.Visible)
-        {
-            visibleCount++;
-        }
+        tree.VisibleFromOutside = left.Visible || right.Visible || up.Visible || down.Visible;
+        tree.ScenicScore = left.ScenicScore * right.ScenicScore * up.ScenicScore * down.ScenicScore;
     }
 }
 
-Console.WriteLine($"Visible trees: {visibleCount}");
+Console.WriteLine($"Visible trees: {trees.Values.Count(o => o.VisibleFromOutside)}");
+Console.WriteLine($"Max scenic score: {trees.Values.Max(o => o.ScenicScore)}");
