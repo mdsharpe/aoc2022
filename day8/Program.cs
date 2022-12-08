@@ -1,17 +1,14 @@
-﻿using System.Linq;
-
-var input = await System.IO.File.ReadAllLinesAsync(args[0]);
-
+﻿var input = await System.IO.File.ReadAllLinesAsync(args[0]);
 var width = input.Select(o => o.Length).Max();
 var height = input.Length;
 
-var trees = new Dictionary<(int X, int Y), int>();
+var trees = new Dictionary<(int X, int Y), Tree>();
 
 for (var y = 0; y < height; y++)
 {
     for (var x = 0; x < width; x++)
     {
-        trees.Add((x, y), int.Parse(input[y][x].ToString()));
+        trees.Add((x, y), new Tree { Height = int.Parse(input[y][x].ToString()) });
     }
 }
 
@@ -23,12 +20,13 @@ for (var y = 0; y < height; y++)
     {
         var tree = trees[(x, y)];
 
-        var blockedLeft = trees.Any(t => t.Key.Y == y && t.Key.X < x && t.Value >= tree);
-        var blockedRight = trees.Any(t => t.Key.Y == y && t.Key.X > x && t.Value >= tree);
-        var blockedUp = trees.Any(t => t.Key.Y < y && t.Key.X == x && t.Value >= tree);
-        var blockedDown = trees.Any(t => t.Key.Y > y && t.Key.X == x && t.Value >= tree);
+        bool GetBlocked(Func<KeyValuePair<(int X, int Y), Tree>, bool> directionCheck)
+            => trees.Where(directionCheck).Any(t => t.Value.Height >= tree.Height);
 
-        if (!blockedLeft || !blockedRight || !blockedUp || !blockedDown)
+        if (!GetBlocked(t => t.Key.Y == y && t.Key.X < x)
+            || !GetBlocked(t => t.Key.Y == y && t.Key.X > x)
+            || !GetBlocked(t => t.Key.Y < y && t.Key.X == x)
+            || !GetBlocked(t => t.Key.Y > y && t.Key.X == x))
         {
             visibleCount++;
         }
@@ -36,4 +34,3 @@ for (var y = 0; y < height; y++)
 }
 
 Console.WriteLine($"Visible trees: {visibleCount}");
-
