@@ -20,13 +20,19 @@ for (var y = 0; y < height; y++)
     {
         var tree = trees[(x, y)];
 
-        bool GetBlocked(Func<KeyValuePair<(int X, int Y), Tree>, bool> directionCheck)
-            => trees.Where(directionCheck).Any(t => t.Value.Height >= tree.Height);
+        (bool Visible, int ScenicScore) InspectDirection(Func<KeyValuePair<(int X, int Y), Tree>, bool> directionClause)
+        {
+            var visible = trees.Where(directionClause).Any(t => t.Value.Height >= tree.Height);
 
-        if (!GetBlocked(t => t.Key.Y == y && t.Key.X < x)
-            || !GetBlocked(t => t.Key.Y == y && t.Key.X > x)
-            || !GetBlocked(t => t.Key.Y < y && t.Key.X == x)
-            || !GetBlocked(t => t.Key.Y > y && t.Key.X == x))
+            return (visible, 0);
+        }
+
+        var left = InspectDirection(t => t.Key.Y == y && t.Key.X < x);
+        var right = InspectDirection(t => t.Key.Y == y && t.Key.X > x);
+        var up = InspectDirection(t => t.Key.Y < y && t.Key.X == x);
+        var down = InspectDirection(t => t.Key.Y > y && t.Key.X == x);
+
+        if (!left.Visible || !right.Visible || !up.Visible || !down.Visible)
         {
             visibleCount++;
         }
