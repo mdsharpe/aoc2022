@@ -18,11 +18,26 @@ for (var y = 0; y < height; y++)
     {
         var tree = trees[(x, y)];
 
-        (bool Visible, int ScenicScore) InspectDirection(Func<KeyValuePair<(int X, int Y), Tree>, bool> directionClause)
+        (bool Visible, int ViewingDistance) InspectDirection(Func<KeyValuePair<(int X, int Y), Tree>, bool> directionClause)
         {
-            var visible = trees.Where(directionClause).All(t => t.Value.Height < tree.Height);
+            var neighbours = trees.Where(directionClause).ToList();
+            var blockers = neighbours.Where(t => t.Value.Height >= tree.Height).ToList();
+            var visible = !blockers.Any();
 
-            return (visible, 0);
+            int viewingDistance;
+            if (visible)
+            {
+                viewingDistance = neighbours.Count;
+            }
+            else
+            {
+                viewingDistance = (from t in blockers
+                                   let distX = Math.Abs(x - t.Key.X)
+                                   let distY = Math.Abs(y - t.Key.Y)
+                                   select distX + distY).Min();
+            }
+
+            return (visible, viewingDistance);
         }
 
         var left = InspectDirection(t => t.Key.Y == y && t.Key.X < x);
@@ -31,7 +46,7 @@ for (var y = 0; y < height; y++)
         var down = InspectDirection(t => t.Key.Y > y && t.Key.X == x);
 
         tree.VisibleFromOutside = left.Visible || right.Visible || up.Visible || down.Visible;
-        tree.ScenicScore = left.ScenicScore * right.ScenicScore * up.ScenicScore * down.ScenicScore;
+        tree.ScenicScore = left.ViewingDistance * right.ViewingDistance * up.ViewingDistance * down.ViewingDistance;
     }
 }
 
