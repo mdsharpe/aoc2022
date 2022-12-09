@@ -4,10 +4,10 @@ struct Move
 {
     private static readonly Regex ParseRegex = new Regex("([UDLR]) (\\d+)");
 
-    public static readonly Move Up = new Move { DX = 0, DY = -1 };
-    public static readonly Move Down = new Move { DX = 0, DY = 1 };
-    public static readonly Move Left = new Move { DX = -1, DY = 0 };
-    public static readonly Move Right = new Move { DX = 1, DY = 0 };
+    private static readonly Move Up = new Move { DX = 0, DY = -1 };
+    private static readonly Move Down = new Move { DX = 0, DY = 1 };
+    private static readonly Move Left = new Move { DX = -1, DY = 0 };
+    private static readonly Move Right = new Move { DX = 1, DY = 0 };
 
     public required int DX { get; init; }
     public required int DY { get; init; }

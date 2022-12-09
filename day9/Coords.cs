@@ -33,7 +33,5 @@ struct Coords
     }
 
     public bool GetIsAdjacentTo(Coords other)
-    {
-        return Math.Abs(other.X - X) <= 1 && Math.Abs(other.Y - Y) <= 1;
-    }
+        => Math.Abs(other.X - X) <= 1 && Math.Abs(other.Y - Y) <= 1;
 }
