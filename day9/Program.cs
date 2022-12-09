@@ -1,23 +1,23 @@
 ﻿var input = await System.IO.File.ReadAllLinesAsync(args[0]);
-var moveSets = input.Select(line => Move.Parse(line)).ToArray();
+var knotCount = int.Parse(args[1]);
+var moves = input.SelectMany(line => Move.ParseMany(line)).ToArray();
 
-var head = new Coords { X = 0, Y = 0 };
-var tail = new Coords { X = 0, Y = 0 };
+var knots = Enumerable.Repeat(Coords.Zero, knotCount).ToArray();
 var tailVisited = new HashSet<Coords>();
 
-foreach (var moveSet in moveSets)
+foreach (var move in moves)
 {
-    foreach (var move in Enumerable.Repeat(moveSet.Move, moveSet.Count))
+    knots[0] = knots[0].Move(move);
+
+    for (var i = 1; i < knots.Length; i++)
     {
-        head = head.Move(move);
-
-        if (!tail.GetIsAdjacentTo(head))
+        if (!knots[i].GetIsAdjacentTo(knots[i - 1]))
         {
-            tail = tail.MoveTowards(head);
+            knots[i] = knots[i].MoveTowards(knots[i - 1]);
         }
-
-        tailVisited.Add(tail);
     }
+
+    tailVisited.Add(knots.Last());
 }
 
 Console.WriteLine($"Tail visited {tailVisited.Count} distinct locations");

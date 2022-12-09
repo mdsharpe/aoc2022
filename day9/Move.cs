@@ -12,7 +12,7 @@ struct Move
     public required int DX { get; init; }
     public required int DY { get; init; }
 
-    public static (Move Move, int Count) Parse(string input)
+    public static IEnumerable<Move> ParseMany(string input)
     {
         var match = ParseRegex.Match(input);
 
@@ -33,6 +33,6 @@ struct Move
             _ => throw new InvalidOperationException()
         };
 
-        return (move, count);
+        return Enumerable.Repeat(move, count);
     }
 }

@@ -1,5 +1,7 @@
 struct Coords
 {
+    public static readonly Coords Zero = new Coords { X = 0, Y = 0 };
+
     public required int X { get; init; }
     public required int Y { get; init; }
 
