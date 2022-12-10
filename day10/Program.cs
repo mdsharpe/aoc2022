@@ -13,8 +13,17 @@ foreach (var action in program.SelectMany(o => o.Actions))
     {
         interestingSignalStrengths.Add(cycle * cpu.X);
     }
-    
+
+    var crtX = ((cycle - 1) % 40) + 1;
+    var spritePositioned = cpu.X >= crtX - 2 && cpu.X <= crtX;
+    Console.Write(spritePositioned ? '#' : '.');
+    if (crtX == 40)
+    {
+        Console.WriteLine();
+    }
+
     action(cpu);
 }
 
+Console.WriteLine();
 Console.WriteLine($"Sum of interesting signal strengths: {interestingSignalStrengths.Sum()}");
