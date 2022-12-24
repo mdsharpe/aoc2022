@@ -3,6 +3,10 @@ internal class Valley
     public Location[,] Map { get; init; }
     public int Width => Map.GetLength(0);
     public int Height => Map.GetLength(1);
+    public int MinX => 1;
+    public int MaxX => Width - 2;
+    public int MinY => 1;
+    public int MaxY => Height - 2;
     public List<Actor> Occupants { get; } = new List<Actor>();
 
     public Valley(string[] input)
@@ -12,6 +16,7 @@ internal class Valley
 
         Map = new Location[width, height];
         var entranceFound = false;
+        var exitFound = false;
 
         for (var y = 0; y < height; y++)
         {
@@ -49,6 +54,10 @@ internal class Valley
                             loc.IsEntrance = true;
                             entranceFound = true;
                         }
+                        if (!exitFound && y == height - 1) {
+                            loc.IsExit = true;
+                            exitFound = true;
+                        }
                         break;
 
                     default:
@@ -65,4 +74,20 @@ internal class Valley
             .Cast<Location>()
             .Single(o => o.IsEntrance)
             .Coordinate;
+
+    public Coordinate GetExit()
+        => Map
+            .Cast<Location>()
+            .Single(o => o.IsExit)
+            .Coordinate;
+
+    public bool GetCanOccupy(Coordinate coordinate)
+        => this.Contains(coordinate)
+        && !Occupants.Any(o => o.Coordinate.Equals(coordinate));
+
+    public bool Contains(Coordinate coordinate)
+        => coordinate.X > 0
+        && coordinate.X < Width - 1
+        && coordinate.Y > 0
+        && coordinate.Y < Height - 1;
 }

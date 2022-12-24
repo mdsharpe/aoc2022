@@ -8,22 +8,22 @@ internal class Blizzard : Actor
     {
         var dest = this.Coordinate.Add(this.Direction);
 
-        if (dest.X > valley.Width - 2)
+        if (dest.X > valley.MaxX)
         {
-            dest = dest.WithX(1);
+            dest = dest.WithX(valley.MinX);
         }
-        else if (dest.X < 1)
+        else if (dest.X < valley.MinX)
         {
-            dest = dest.WithX(valley.Width - 2);
+            dest = dest.WithX(valley.MaxX);
         }
 
-        if (dest.Y > valley.Height - 2)
+        if (dest.Y > valley.MaxY)
         {
-            dest = dest.WithY(1);
+            dest = dest.WithY(valley.MinY);
         }
-        else if (dest.Y < 1)
+        else if (dest.Y < valley.MinY)
         {
-            dest = dest.WithY(valley.Height - 2);
+            dest = dest.WithY(valley.MaxY);
         }
 
         Coordinate = dest;

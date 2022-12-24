@@ -1,5 +1,6 @@
 internal struct Direction
 {
+    public static Direction Wait = default;
     public static Direction Up = new Direction { Dy = -1, Char = '^' };
     public static Direction Down = new Direction { Dy = 1, Char = 'v' };
     public static Direction Left = new Direction { Dx = -1, Char = '<' };
@@ -10,13 +11,14 @@ internal struct Direction
     public char Char { get; init; }
 
     public static Direction Parse(char c)
-        => EnumeratePossibleDirections().FirstOrDefault(o => o.Char == c);
+        => EnumerateAll().FirstOrDefault(o => o.Char == c);
 
-    private static IEnumerable<Direction> EnumeratePossibleDirections()
+    public static IEnumerable<Direction> EnumerateAll()
     {
-        yield return Up;
-        yield return Down;
-        yield return Left;
         yield return Right;
+        yield return Down;
+        yield return Up;
+        yield return Left;
+        yield return Wait;
     }
 }
