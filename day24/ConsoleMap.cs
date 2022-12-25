@@ -1,9 +1,10 @@
-using static System.Console;
+using System.Text;
+
 internal static class ConsoleMap
 {
     public static void WriteMap(Valley valley)
     {
-        Clear();
+        var output = new StringBuilder();
 
         for (var y = 0; y < valley.Height; y++)
         {
@@ -40,10 +41,13 @@ internal static class ConsoleMap
                     o = '.';
                 }
 
-                Write(o);
+                output.Append(o);
             }
 
-            WriteLine();
+            output.Append(Environment.NewLine);
         }
+
+        Console.Clear();
+        Console.Write(output);
     }
 }

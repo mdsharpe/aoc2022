@@ -3,6 +3,13 @@ internal struct Coordinate
     public required int X { get; init; }
     public required int Y { get; init; }
 
+    public static bool operator ==(Coordinate lhs, Coordinate rhs)
+    {
+        return lhs.Equals(rhs);
+    }
+
+    public static bool operator !=(Coordinate lhs, Coordinate rhs) => !(lhs == rhs);
+
     public Coordinate Add(Direction direction)
         => new Coordinate
         {

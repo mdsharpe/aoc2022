@@ -2,18 +2,22 @@ internal class Expedition : Actor
 {
     public override char ToChar() => 'E';
 
-    public ISet<Coordinate> NextStepsTried { get; set; } = new HashSet<Coordinate>();
-
     public override void MoveWithin(Valley valley)
     {
-        var possibleMoves = from d in Direction.EnumerateAll()
-                            let c = Coordinate.Add(d)
-                            where d.Equals(Direction.Wait)
-                                || valley.GetCanOccupy(c)
-                                || c.Equals(valley.GetExit())
-                            where !NextStepsTried.Contains(c)
-                            select c;
+        var nxtGen = (from d in Direction.EnumerateAll()
+                      let c = Coordinate.Add(d)
+                      where valley.GetCanOccupy(c)
+                          || c == valley.GetExit()
+                      select new Expedition
+                      {
+                          Coordinate = c
+                      }).ToArray();
 
-        Coordinate = possibleMoves.First();
+        if (!nxtGen.Any())
+        {
+            nxtGen = new[] { this };
+        }
+
+        valley.ExpeditionsNxtGen.AddRange(nxtGen);
     }
 }

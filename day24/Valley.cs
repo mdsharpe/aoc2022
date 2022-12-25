@@ -7,7 +7,10 @@ internal class Valley
     public int MaxX => Width - 2;
     public int MinY => 1;
     public int MaxY => Height - 2;
-    public List<Actor> Occupants { get; } = new List<Actor>();
+    public List<Blizzard> Blizzards { get; } = new List<Blizzard>();
+    public List<Expedition> Expeditions { get; } = new List<Expedition>();
+    public List<Expedition> ExpeditionsNxtGen { get; } = new List<Expedition>();
+    public IEnumerable<Actor> Occupants => Enumerable.Concat<Actor>(Blizzards, Expeditions);
 
     public Valley(string[] input)
     {
@@ -40,7 +43,7 @@ internal class Valley
                     case 'v':
                     case '<':
                     case '>':
-                        Occupants.Add(new Blizzard
+                        Blizzards.Add(new Blizzard
                         {
                             Coordinate = coordinate,
                             Direction = Direction.Parse(c)
@@ -54,7 +57,8 @@ internal class Valley
                             loc.IsEntrance = true;
                             entranceFound = true;
                         }
-                        if (!exitFound && y == height - 1) {
+                        if (!exitFound && y == height - 1)
+                        {
                             loc.IsExit = true;
                             exitFound = true;
                         }
@@ -67,6 +71,13 @@ internal class Valley
                 Map[x, y] = loc;
             }
         }
+    }
+
+    public void RevExpeditions()
+    {
+        Expeditions.Clear();
+        Expeditions.AddRange(ExpeditionsNxtGen);
+        ExpeditionsNxtGen.Clear();
     }
 
     public Coordinate GetEntrance()
@@ -83,7 +94,7 @@ internal class Valley
 
     public bool GetCanOccupy(Coordinate coordinate)
         => this.Contains(coordinate)
-        && !Occupants.Any(o => o.Coordinate.Equals(coordinate));
+        && !Blizzards.Any(o => o.Coordinate == coordinate);
 
     public bool Contains(Coordinate coordinate)
         => coordinate.X > 0

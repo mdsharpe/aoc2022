@@ -1,25 +1,30 @@
-﻿const int speed = 250;
+﻿const int speed = 0;
 var input = await System.IO.File.ReadAllLinesAsync(args[0]);
 var valley = new Valley(input);
-
-var expedition = new Expedition { Coordinate = valley.GetEntrance() };
-valley.Occupants.Add(expedition);
-
-var moveTreeRoot = new MoveTreeNode();
+valley.Expeditions.Add(new Expedition { Coordinate = valley.GetEntrance() });
+var exit = valley.GetExit();
 
 ConsoleMap.WriteMap(valley);
 await Task.Delay(speed);
 
+var minute = 0;
 do
 {
     var delay = Task.Delay(speed);
 
-    foreach (var actor in valley.Occupants)
+    foreach (var actor in valley.Occupants.ToArray())
     {
         actor.MoveWithin(valley);
     }
 
+    valley.RevExpeditions();
+
+    minute++;
+
     ConsoleMap.WriteMap(valley);
 
     await delay;
-} while (!expedition.Coordinate.Equals(valley.GetExit()));
+} while (!valley.Expeditions.Any(o => o.Coordinate == exit));
+
+Console.WriteLine();
+Console.WriteLine(minute.ToString());

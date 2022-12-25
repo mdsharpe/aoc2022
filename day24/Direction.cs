@@ -19,6 +19,5 @@ internal struct Direction
         yield return Down;
         yield return Up;
         yield return Left;
-        yield return Wait;
     }
 }
