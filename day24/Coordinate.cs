@@ -3,8 +3,8 @@ internal struct Coordinate
     public required int X { get; init; }
     public required int Y { get; init; }
 
-    public static bool operator ==(Coordinate x, Coordinate y) => x.Equals(y);
-    public static bool operator !=(Coordinate x, Coordinate y) => !(x == y);
+    public static bool operator ==(Coordinate a, Coordinate b) => a.Equals(b);
+    public static bool operator !=(Coordinate a, Coordinate b) => !(a == b);
 
     public Coordinate Add(Direction direction)
         => new Coordinate

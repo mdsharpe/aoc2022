@@ -2,7 +2,7 @@ using System.Text;
 
 internal static class ConsoleMap
 {
-    public static void WriteMap(Valley valley)
+    public static void WriteMap(Valley valley, int minute)
     {
         var output = new StringBuilder();
 
@@ -11,19 +11,12 @@ internal static class ConsoleMap
             for (var x = 0; x < valley.Width; x++)
             {
                 var l = valley.Map[x, y];
-                var occupants = valley.Occupants
-                    .Where(o => o.Coordinate.X == x && o.Coordinate.Y == y)
-                    .ToList();
-
+                var occupants = valley.GetOccupants(new Coordinate { X = x, Y = y });
                 char o;
 
                 if (occupants.Any())
                 {
-                    if (occupants.Any(o => o is Expedition))
-                    {
-                        o = 'E';
-                    }
-                    else if (occupants.Count == 1)
+                    if (occupants.Count == 1)
                     {
                         o = occupants.Single().ToChar();
                     }
@@ -60,5 +53,6 @@ internal static class ConsoleMap
         Console.Write(output);
         Console.WriteLine();
         Console.WriteLine($"{valley.Expeditions.Count} expeditions.");
+        Console.WriteLine($"{minute} minutes passed.");
     }
 }

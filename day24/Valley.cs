@@ -1,5 +1,8 @@
 internal class Valley
 {
+    private Dictionary<Coordinate, List<Actor>> _occupants = new Dictionary<Coordinate, List<Actor>>();
+    private HashSet<Coordinate> _blizzardCoordinates = new HashSet<Coordinate>();
+
     public Location[,] Map { get; init; }
     public Coordinate Entrance { get; init; }
     public Coordinate Exit { get; init; }
@@ -12,7 +15,6 @@ internal class Valley
     public List<Blizzard> Blizzards { get; } = new List<Blizzard>();
     public List<Expedition> Expeditions { get; } = new List<Expedition>();
     public List<Expedition> ExpeditionsNextGen { get; } = new List<Expedition>();
-    public IEnumerable<Actor> Occupants => Enumerable.Concat<Actor>(Blizzards, Expeditions);
 
     public Valley(string[] input)
     {
@@ -75,23 +77,70 @@ internal class Valley
                 Map[x, y] = loc;
             }
         }
+
+        Expeditions.Add(new Expedition { Coordinate = this.Entrance });
+
+        HashBlizzardCoordinates();
+        BuildOccupantsDictionary();
     }
 
-    public void RevExpeditions()
+    public List<Actor> GetOccupants(Coordinate coordinate)
     {
+        if (_occupants.TryGetValue(coordinate, out var o))
+        {
+            return o;
+        }
+
+        return new List<Actor>();
+    }
+
+    public void Tick()
+    {
+        Parallel.ForEach(Blizzards, o => o.MoveWithin(this));
+        HashBlizzardCoordinates();
+
+        foreach (var actor in Expeditions)
+        {
+            actor.MoveWithin(this);
+        }
+
         Expeditions.Clear();
-        var nxt = ExpeditionsNextGen.Distinct().ToList();
-        Expeditions.AddRange(nxt);
+        Expeditions.AddRange(ExpeditionsNextGen.Distinct());
         ExpeditionsNextGen.Clear();
+
+        BuildOccupantsDictionary();
     }
 
     public bool GetCanOccupy(Coordinate coordinate)
-        => (this.Contains(coordinate) && !Blizzards.Any(o => o.Coordinate == coordinate))
-        || coordinate == this.Entrance || coordinate == this.Exit;
+    {
+        if (coordinate == this.Entrance || coordinate == this.Exit)
+        {
+            return true;
+        }
+
+        if (!this.Contains(coordinate))
+        {
+            return false;
+        }
+
+        return !_blizzardCoordinates.Contains(coordinate);
+    }
 
     public bool Contains(Coordinate coordinate)
         => coordinate.X > 0
         && coordinate.X < Width - 1
         && coordinate.Y > 0
         && coordinate.Y < Height - 1;
+
+    private void BuildOccupantsDictionary()
+    {
+        _occupants = Enumerable.Concat<Actor>(Blizzards, Expeditions)
+            .GroupBy(o => o.Coordinate)
+            .ToDictionary(o => o.Key, o => o.ToList());
+    }
+
+    private void HashBlizzardCoordinates()
+    {
+        _blizzardCoordinates = Blizzards.Select(o => o.Coordinate).ToHashSet();
+    }
 }
