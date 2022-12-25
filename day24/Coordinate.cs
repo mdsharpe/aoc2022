@@ -3,12 +3,8 @@ internal struct Coordinate
     public required int X { get; init; }
     public required int Y { get; init; }
 
-    public static bool operator ==(Coordinate lhs, Coordinate rhs)
-    {
-        return lhs.Equals(rhs);
-    }
-
-    public static bool operator !=(Coordinate lhs, Coordinate rhs) => !(lhs == rhs);
+    public static bool operator ==(Coordinate x, Coordinate y) => x.Equals(y);
+    public static bool operator !=(Coordinate x, Coordinate y) => !(x == y);
 
     public Coordinate Add(Direction direction)
         => new Coordinate
@@ -30,4 +26,11 @@ internal struct Coordinate
             X = this.X,
             Y = y
         };
+
+    public override bool Equals(object? obj)
+        => obj is Coordinate other
+        && X == other.X
+        && Y == other.Y;
+
+    public override int GetHashCode() => HashCode.Combine(X, Y);
 }

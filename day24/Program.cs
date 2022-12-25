@@ -1,8 +1,7 @@
-﻿const int speed = 0;
+﻿const int speed = 500;
 var input = await System.IO.File.ReadAllLinesAsync(args[0]);
 var valley = new Valley(input);
-valley.Expeditions.Add(new Expedition { Coordinate = valley.GetEntrance() });
-var exit = valley.GetExit();
+valley.Expeditions.Add(new Expedition { Coordinate = valley.Entrance });
 
 ConsoleMap.WriteMap(valley);
 await Task.Delay(speed);
@@ -22,9 +21,7 @@ do
     minute++;
 
     ConsoleMap.WriteMap(valley);
+    Console.WriteLine($"{minute} minutes passed.");
 
     await delay;
-} while (!valley.Expeditions.Any(o => o.Coordinate == exit));
-
-Console.WriteLine();
-Console.WriteLine(minute.ToString());
+} while (!valley.Expeditions.Any(o => o.Coordinate == valley.Exit));

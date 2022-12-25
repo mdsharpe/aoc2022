@@ -1,6 +1,8 @@
 internal class Valley
 {
     public Location[,] Map { get; init; }
+    public Coordinate Entrance { get; init; }
+    public Coordinate Exit { get; init; }
     public int Width => Map.GetLength(0);
     public int Height => Map.GetLength(1);
     public int MinX => 1;
@@ -9,7 +11,7 @@ internal class Valley
     public int MaxY => Height - 2;
     public List<Blizzard> Blizzards { get; } = new List<Blizzard>();
     public List<Expedition> Expeditions { get; } = new List<Expedition>();
-    public List<Expedition> ExpeditionsNxtGen { get; } = new List<Expedition>();
+    public List<Expedition> ExpeditionsNextGen { get; } = new List<Expedition>();
     public IEnumerable<Actor> Occupants => Enumerable.Concat<Actor>(Blizzards, Expeditions);
 
     public Valley(string[] input)
@@ -54,14 +56,16 @@ internal class Valley
                     case '.':
                         if (!entranceFound && y == 0)
                         {
-                            loc.IsEntrance = true;
                             entranceFound = true;
+                            Entrance = loc.Coordinate;
                         }
+
                         if (!exitFound && y == height - 1)
                         {
-                            loc.IsExit = true;
                             exitFound = true;
+                            Exit = loc.Coordinate;
                         }
+
                         break;
 
                     default:
@@ -76,25 +80,14 @@ internal class Valley
     public void RevExpeditions()
     {
         Expeditions.Clear();
-        Expeditions.AddRange(ExpeditionsNxtGen);
-        ExpeditionsNxtGen.Clear();
+        var nxt = ExpeditionsNextGen.Distinct().ToList();
+        Expeditions.AddRange(nxt);
+        ExpeditionsNextGen.Clear();
     }
 
-    public Coordinate GetEntrance()
-        => Map
-            .Cast<Location>()
-            .Single(o => o.IsEntrance)
-            .Coordinate;
-
-    public Coordinate GetExit()
-        => Map
-            .Cast<Location>()
-            .Single(o => o.IsExit)
-            .Coordinate;
-
     public bool GetCanOccupy(Coordinate coordinate)
-        => this.Contains(coordinate)
-        && !Blizzards.Any(o => o.Coordinate == coordinate);
+        => (this.Contains(coordinate) && !Blizzards.Any(o => o.Coordinate == coordinate))
+        || coordinate == this.Entrance || coordinate == this.Exit;
 
     public bool Contains(Coordinate coordinate)
         => coordinate.X > 0

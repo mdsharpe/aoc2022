@@ -19,7 +19,11 @@ internal static class ConsoleMap
 
                 if (occupants.Any())
                 {
-                    if (occupants.Count == 1)
+                    if (occupants.Any(o => o is Expedition))
+                    {
+                        o = 'E';
+                    }
+                    else if (occupants.Count == 1)
                     {
                         o = occupants.Single().ToChar();
                     }
@@ -47,7 +51,14 @@ internal static class ConsoleMap
             output.Append(Environment.NewLine);
         }
 
-        Console.Clear();
+        try
+        {
+            Console.Clear();
+        }
+        catch { }
+
         Console.Write(output);
+        Console.WriteLine();
+        Console.WriteLine($"{valley.Expeditions.Count} expeditions.");
     }
 }

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 internal struct Direction
 {
     public static Direction Wait = default;
@@ -5,6 +7,14 @@ internal struct Direction
     public static Direction Down = new Direction { Dy = 1, Char = 'v' };
     public static Direction Left = new Direction { Dx = -1, Char = '<' };
     public static Direction Right = new Direction { Dx = 1, Char = '>' };
+
+    public static bool operator ==(Direction x, Direction y) => x.Equals(y);
+    public static bool operator !=(Direction x, Direction y) => !(x == y);
+
+    public override bool Equals([NotNullWhen(true)] object? obj)
+        => obj is Direction other
+        && other.Dx == this.Dx
+        && other.Dy == this.Dy;
 
     public int Dx { get; init; }
     public int Dy { get; init; }
@@ -19,5 +29,9 @@ internal struct Direction
         yield return Down;
         yield return Up;
         yield return Left;
+        yield return Wait;
     }
+
+    public override int GetHashCode()
+        => HashCode.Combine(Dx, Dy, Char);
 }
