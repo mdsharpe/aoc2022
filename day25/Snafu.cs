@@ -8,7 +8,7 @@ internal static class SnafuConvert
 
         for (var i = 0; i < digits.Length; i++)
         {
-            var place = (int)Math.Pow(5, i);
+            var place = (long)Math.Pow(5, i);
 
             var digit = digits[i] switch
             {
@@ -34,8 +34,8 @@ internal static class SnafuConvert
             maxI++;
         }
 
-        var digits = new Dictionary<int, long> { { 0, x } };
-        void IncrementDigit(int index, long increment)
+        var digits = new Dictionary<long, long> { { 0, x } };
+        void IncrementDigit(long index, long increment)
         {
             if (!digits.TryGetValue(index, out var value)) value = 0;
             value += increment;
@@ -48,14 +48,22 @@ internal static class SnafuConvert
             {
                 if (Math.Abs(digit.Value) > 2)
                 {
-                    var thisPlace = (int)Math.Pow(5, digit.Key);
-                    var nextPlace = (int)Math.Pow(5, digit.Key + 1);
+                    var thisPlace = (long)Math.Pow(5, digit.Key);
+                    var nextPlace = (long)Math.Pow(5, digit.Key + 1);
 
-                    var nextAdd = Math.Max(1, (long)Math.Floor((digit.Value * thisPlace) / (decimal)nextPlace));
+                    var nextAdd = (long)Math.Floor((digit.Value * thisPlace) / (decimal)nextPlace);
+                    nextAdd = nextAdd < 0 ? Math.Min(-1, nextAdd) : Math.Max(1, nextAdd);
 
                     var remainder = (digit.Value * thisPlace) - (nextAdd * nextPlace);
                     var remainderThisPlace = (long)Math.Floor(remainder / (decimal)thisPlace);
-                    var remainderOnes = remainder - (remainderThisPlace  * thisPlace);
+                    var remainderOnes = remainder - (remainderThisPlace * thisPlace);
+
+                    var totalAddingToNext = nextAdd * nextPlace;
+                    var totalSubtractingFromThis = (digits[digit.Key] - remainderThisPlace) * thisPlace;
+                    if (totalAddingToNext != (totalSubtractingFromThis + remainderOnes))
+                    {
+                        throw new InvalidOperationException($"Change sanity check failed; {totalAddingToNext} != {totalSubtractingFromThis} + {remainderOnes}");
+                    }
 
                     IncrementDigit(digit.Key + 1, nextAdd);
                     digits[digit.Key] = remainderThisPlace;
